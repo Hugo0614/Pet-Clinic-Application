@@ -44,3 +44,7 @@ cypress/videos/
 *.war
 *.ear
 *.class
+
+# Process documentation and test utilities (development only)
+process-documentation/
+test-utilities/
