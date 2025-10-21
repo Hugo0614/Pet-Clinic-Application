@@ -23,6 +23,40 @@ This is a full-stack application that allows pet owners and veterinarians to man
 - **Tailwind CSS:** For styling the application.
 - **React Context API:** For managing global state (e.g., authentication).
 
+## CI/CD Automation
+
+This project integrates a comprehensive GitHub Actions CI/CD pipeline to automate the building and testing process. The pipeline is configured to run automatically whenever code is pushed to the `main` branch.
+
+### How it works:
+
+- **Trigger:** The workflow is triggered on every `push` event to the `main` branch.
+- **Parallel Jobs:** The pipeline consists of two independent jobs that run in parallel:
+  - **Backend Build Job (`build-backend`):** 
+    - Sets up Java Development Kit (JDK) 21
+    - Caches Maven dependencies to accelerate subsequent builds
+    - Compiles, tests, and packages the backend application using Maven
+  - **Frontend Build Job (`build-frontend`)**:
+    - Sets up Node.js 20.x runtime
+    - Caches NPM dependencies to accelerate subsequent builds
+    - Installs frontend dependencies via npm
+    - Builds the frontend application using Vite
+
+### Performance Optimization:
+
+The workflow uses GitHub Actions' caching mechanism (`actions/cache`) to cache:
+- Maven dependencies (`~/.m2/repository`) for faster backend builds
+- NPM dependencies (`node_modules`) for faster frontend builds
+
+This significantly reduces build times for subsequent runs by avoiding redundant dependency downloads.
+
+### GitHub Actions Status Badge:
+
+You can add a status badge to display the CI/CD pipeline status:
+
+```markdown
+[![CI Build Status](https://github.com/Hugo0614/Pet-Clinic-Application/actions/workflows/ci-build.yml/badge.svg)](https://github.com/Hugo0614/Pet-Clinic-Application/actions/workflows/ci-build.yml)
+```
+
 ## Features
 
 ### Backend (Backend API)
@@ -93,6 +127,6 @@ This is a full-stack application that allows pet owners and veterinarians to man
 - **Script programming on AIX/Linux/Windows operating systems:** This project includes basic shell scripts for development and testing (e.g., `start_dev.sh`) but **does not contain complex scripts for AIX, Linux, or Windows** operating systems.
 - **Supporting mission critical systems and mobile application:** This project is a web application and is **not designed as a mission-critical system or a native mobile application**.
 - **Integrate and maintain workflow engines for business process automation:** This project **does not use** any workflow engines.
-- **CI/CD pipelines and GitHub Actions:** The project repository **does not contain any CI/CD configurations** in a `.github/workflows` directory.
+- **CI/CD pipelines and GitHub Actions:** This project **now includes a GitHub Actions CI/CD pipeline** (`.github/workflows/ci-build.yml`) that automatically builds and tests the application on every push to the `main` branch. The pipeline runs both backend (Maven) and frontend (Node.js) builds in parallel, with caching optimizations for improved performance.
 - **Python:** This project **does not use** Python.
 - **Ansible:** This project **does not use** Ansible.
