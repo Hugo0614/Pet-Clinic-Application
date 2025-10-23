@@ -48,3 +48,18 @@ cypress/videos/
 # Process documentation and test utilities (development only)
 process-documentation/
 test-utilities/
+
+# CI/CD documentation (local reference only, not for public repo)
+CI_CD_GUIDE_CN.md
+CI_CD_DEMO_CN.md
+CI_CD_SUMMARY_CN.md
+YAML_SPEC_CN.md
+DOCS_NAVIGATION_CN.md
+PROJECT_COMPLETION_SUMMARY_CN.md
+
+# CI/CD explanation files (for local reference only)
+CI_CD_DEMO_CN.md
+CI_CD_GUIDE_CN.md
+CI_CD_SUMMARY_CN.md
+DOCS_NAVIGATION_CN.md
+PROJECT_COMPLETION_SUMMARY_CN.md
