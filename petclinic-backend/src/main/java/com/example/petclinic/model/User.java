@@ -19,6 +19,12 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(unique = true, nullable = false)
+    private String phoneNumber;
+
+    @Column(unique = true, nullable = false)
+    private String identityCode;
+
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pet> pets;
 
@@ -31,6 +37,10 @@ public class User {
     public void setPassword(String password) { this.password = password; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+    public String getIdentityCode() { return identityCode; }
+    public void setIdentityCode(String identityCode) { this.identityCode = identityCode; }
     public List<Pet> getPets() { return pets; }
     public void setPets(List<Pet> pets) { this.pets = pets; }
 }

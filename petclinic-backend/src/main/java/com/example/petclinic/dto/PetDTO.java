@@ -9,5 +9,6 @@ public record PetDTO(
     @NotBlank String name,
     @NotBlank String species,
     @NotBlank String breed,
-    @NotNull LocalDate birthDate
+    @NotNull LocalDate birthDate,
+    LocalDate lastVisitDate
 ) {}

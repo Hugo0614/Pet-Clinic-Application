@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage';
 import NotFoundPage from './pages/NotFoundPage';
 import OwnerDashboardPage from './pages/owner/OwnerDashboardPage';
 import ScheduleAppointmentPage from './pages/owner/ScheduleAppointmentPage';
+import EditAppointmentPage from './pages/owner/EditAppointmentPage';
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import PetMedicalHistoryPage from './pages/doctor/PetMedicalHistoryPage';
 
@@ -21,6 +22,7 @@ const App: React.FC = () => (
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/owner" element={<ProtectedRoute role="OWNER"><OwnerDashboardPage /></ProtectedRoute>} />
       <Route path="/owner/schedule" element={<ProtectedRoute role="OWNER"><ScheduleAppointmentPage /></ProtectedRoute>} />
+      <Route path="/owner/edit-appointment/:id" element={<ProtectedRoute role="OWNER"><EditAppointmentPage /></ProtectedRoute>} />
       <Route path="/doctor" element={<ProtectedRoute role="DOCTOR"><DoctorDashboardPage /></ProtectedRoute>} />
       <Route path="/doctor/pet/:petId" element={<ProtectedRoute role="DOCTOR"><PetMedicalHistoryPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFoundPage />} />

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public record AppointmentDTO(
     Long id,
+    String appointmentCode,
     @NotNull LocalDateTime appointmentTime,
     @NotNull Long petId,
     @NotNull Long doctorId,

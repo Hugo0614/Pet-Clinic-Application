@@ -49,7 +49,11 @@ cypress/videos/
 process-documentation/
 test-utilities/
 
-# CI/CD documentation (local reference only, not for public repo)
+# Database backups (local only)
+backup_*.sql
+*.sql.backup
+
+# Development documentation (local reference only)
 CI_CD_GUIDE_CN.md
 CI_CD_DEMO_CN.md
 CI_CD_SUMMARY_CN.md
@@ -57,10 +61,25 @@ YAML_SPEC_CN.md
 DOCS_NAVIGATION_CN.md
 PROJECT_COMPLETION_SUMMARY_CN.md
 LOCAL_DOCS_PROTECTION_GUIDE.md
+DATABASE_MIGRATION_GUIDE.md
+MIGRATION_QUICKSTART.md
+MIGRATION_VISUAL_GUIDE.md
+REGISTRATION_REFACTOR_SUMMARY.md
+VALIDATION_RULES_REFERENCE.md
+TROUBLESHOOTING_EDIT_DELETE.md
+DOCTOR_VIEW_FIX.md
+ID_MANAGEMENT_ANALYSIS.md
+WHY_NO_ID_REUSE.md
+SOFT_DELETE_STRATEGY.md
+DOCTOR_ID_REFACTORING_SUMMARY.md
+IMPLEMENTATION_PLAN_DOCTOR_IDS.md
+IMPLEMENTATION_STATUS.md
+QUICKSTART_MIGRATION.md
+ARCHITECTURE_VISUAL_GUIDE.md
 
-# CI/CD explanation files (for local reference only)
-CI_CD_DEMO_CN.md
-CI_CD_GUIDE_CN.md
-CI_CD_SUMMARY_CN.md
-DOCS_NAVIGATION_CN.md
-PROJECT_COMPLETION_SUMMARY_CN.md
+# Development scripts (local only)
+start_dev.sh
+diagnose_edit_delete.sh
+migrate_database.sh
+migrate_add_phone_identity.sql
+migrate_doctor_ids.sql

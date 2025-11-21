@@ -3,7 +3,7 @@ import api from '../../services/api';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Pet {
   id: number;
@@ -19,6 +19,14 @@ interface Doctor {
   role: string;
 }
 
+interface Appointment {
+  id: number;
+  appointmentTime: string;
+  status: string;
+  petId: number;
+  doctorId: number;
+}
+
 // Generate business hours time slots (09:00 - 19:00, 30-minute intervals)
 const generateTimeSlots = (): string[] => {
   const slots: string[] = [];
@@ -32,7 +40,8 @@ const generateTimeSlots = (): string[] => {
   return slots;
 };
 
-const ScheduleAppointmentPage: React.FC = () => {
+const EditAppointmentPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const [pets, setPets] = useState<Pet[]>([]);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [petId, setPetId] = useState('');
@@ -46,27 +55,42 @@ const ScheduleAppointmentPage: React.FC = () => {
   const timeSlots = generateTimeSlots();
 
   useEffect(() => {
+    // Load pets, doctors, and current appointment data
     Promise.all([
       api.get('/pets'),
-      api.get('/users/doctors')
-    ]).then(([petsRes, doctorsRes]) => {
+      api.get('/users/doctors'),
+      api.get('/appointments')
+    ]).then(([petsRes, doctorsRes, appointmentsRes]) => {
       setPets(petsRes.data);
       setDoctors(doctorsRes.data);
       
-      if (petsRes.data.length > 0) {
-        setPetId(petsRes.data[0].id.toString());
-      }
-      if (doctorsRes.data.length > 0) {
-        setDoctorId(doctorsRes.data[0].id.toString());
+      // Find the current appointment
+      const currentAppointment = appointmentsRes.data.find(
+        (apt: Appointment) => apt.id === Number(id)
+      );
+      
+      if (currentAppointment) {
+        setPetId(currentAppointment.petId.toString());
+        setDoctorId(currentAppointment.doctorId.toString());
+        
+        // Parse the appointment date and time
+        const dateTime = new Date(currentAppointment.appointmentTime);
+        const date = dateTime.toISOString().split('T')[0];
+        const time = `${dateTime.getHours().toString().padStart(2, '0')}:${dateTime.getMinutes().toString().padStart(2, '0')}`;
+        
+        setAppointmentDate(date);
+        setAppointmentTime(time);
+      } else {
+        setError('Appointment not found');
       }
       
       setLoading(false);
     }).catch(err => {
       console.error('Failed to load data', err);
-      setError('Failed to load pets or doctors');
+      setError('Failed to load appointment data');
       setLoading(false);
     });
-  }, []);
+  }, [id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,14 +100,14 @@ const ScheduleAppointmentPage: React.FC = () => {
     const appointmentDateTime = `${appointmentDate}T${appointmentTime}:00`;
     
     try {
-      await api.post('/appointments', {
+      await api.put(`/appointments/${id}`, {
         petId: Number(petId),
         doctorId: Number(doctorId),
         appointmentTime: appointmentDateTime,
       });
       navigate('/owner');
     } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to schedule appointment';
+      const errorMessage = err.response?.data?.message || err.message || 'Failed to update appointment';
       setError(errorMessage);
     }
   };
@@ -98,24 +122,12 @@ const ScheduleAppointmentPage: React.FC = () => {
     );
   }
 
-  if (pets.length === 0) {
+  if (error && !petId) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-100">
         <Card className="max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4 text-center text-red-600">No Pets Found</h2>
-          <p className="text-center mb-4">You need to add a pet before scheduling an appointment.</p>
-          <Button onClick={() => navigate('/owner')}>Go to Dashboard</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (doctors.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card className="max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4 text-center text-red-600">No Doctors Available</h2>
-          <p className="text-center mb-4">No doctors are currently registered in the system.</p>
+          <h2 className="text-2xl font-bold mb-4 text-center text-red-600">Error</h2>
+          <p className="text-center mb-4">{error}</p>
           <Button onClick={() => navigate('/owner')}>Go to Dashboard</Button>
         </Card>
       </div>
@@ -125,7 +137,7 @@ const ScheduleAppointmentPage: React.FC = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4 text-center">Schedule Appointment</h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">Edit Appointment</h2>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* Pet Selection */}
           <div>
@@ -209,7 +221,7 @@ const ScheduleAppointmentPage: React.FC = () => {
               Cancel
             </Button>
             <Button type="submit" className="flex-1">
-              Schedule Appointment
+              Update Appointment
             </Button>
           </div>
         </form>
@@ -218,4 +230,4 @@ const ScheduleAppointmentPage: React.FC = () => {
   );
 };
 
-export default ScheduleAppointmentPage;
+export default EditAppointmentPage;

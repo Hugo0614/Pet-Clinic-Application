@@ -10,9 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +29,14 @@ public class AppointmentController {
                 appointmentDTO.doctorId(),
                 appointmentDTO.appointmentTime()
         );
-        return new AppointmentDTO(appointment.getId(), appointment.getAppointmentTime(), appointment.getPet().getId(), appointment.getDoctor().getId(), appointment.getStatus());
+        return new AppointmentDTO(
+                appointment.getId(),
+                appointment.getAppointmentCode(),
+                appointment.getAppointmentTime(),
+                appointment.getPet().getId(),
+                appointment.getDoctor().getDoctorId(),
+                appointment.getStatus()
+        );
     }
 
     @GetMapping
@@ -39,15 +44,58 @@ public class AppointmentController {
         User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         if ("OWNER".equals(user.getRole())) {
             return appointmentService.getAppointmentsForOwner(userDetails.getUsername()).stream()
-                    .map(a -> new AppointmentDTO(a.getId(), a.getAppointmentTime(), a.getPet().getId(), a.getDoctor().getId(), a.getStatus()))
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getAppointmentCode(),
+                            a.getAppointmentTime(),
+                            a.getPet().getId(),
+                            a.getDoctor().getDoctorId(),
+                            a.getStatus()
+                    ))
                     .collect(Collectors.toList());
         } else if ("DOCTOR".equals(user.getRole())) {
-            LocalDateTime startOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
-            LocalDateTime endOfDay = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
-            return appointmentService.getAppointmentsForDoctor(user.getId(), startOfDay, endOfDay).stream()
-                    .map(a -> new AppointmentDTO(a.getId(), a.getAppointmentTime(), a.getPet().getId(), a.getDoctor().getId(), a.getStatus()))
+            // Show all upcoming appointments (from now onwards) instead of just today
+            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime farFuture = LocalDateTime.now().plusYears(1); // Next year
+            return appointmentService.getAppointmentsForDoctor(user.getId(), now, farFuture).stream()
+                    .map(a -> new AppointmentDTO(
+                            a.getId(),
+                            a.getAppointmentCode(),
+                            a.getAppointmentTime(),
+                            a.getPet().getId(),
+                            a.getDoctor().getDoctorId(),
+                            a.getStatus()
+                    ))
                     .collect(Collectors.toList());
         }
         return List.of();
+    }
+
+    @PutMapping("/{id}")
+    public AppointmentDTO updateAppointment(
+            @PathVariable Long id,
+            @Validated @RequestBody AppointmentDTO appointmentDTO,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Appointment appointment = appointmentService.updateAppointment(
+                id,
+                appointmentDTO.petId(),
+                appointmentDTO.doctorId(),
+                appointmentDTO.appointmentTime()
+        );
+        return new AppointmentDTO(
+                appointment.getId(),
+                appointment.getAppointmentCode(),
+                appointment.getAppointmentTime(),
+                appointment.getPet().getId(),
+                appointment.getDoctor().getDoctorId(),
+                appointment.getStatus()
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteAppointment(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        appointmentService.deleteAppointment(id, userDetails.getUsername());
     }
 }
