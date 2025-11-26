@@ -1,0 +1,14 @@
+# Root level .dockerignore
+.git/
+.github/
+*.md
+*.log
+*.sh
+.env
+.env.example
+process-documentation/
+test-utilities/
+backup_*.sql
+migrate_*.sql
+diagnose_*.sh
+test-*.sh

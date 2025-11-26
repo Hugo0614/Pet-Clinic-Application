@@ -10,6 +10,7 @@ interface Appointment {
   status: string;
   petId: number;
   doctorId: number;
+  petName?: string;
 }
 
 const DoctorDashboardPage: React.FC = () => {
@@ -38,54 +39,75 @@ const DoctorDashboardPage: React.FC = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Upcoming Appointments</h1>
-        <Button onClick={loadAppointments} disabled={loading}>
-          {loading ? 'Refreshing...' : 'Refresh'}
-        </Button>
-      </div>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-12">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-bold text-slate-800 mb-2">Doctor Dashboard</h1>
+            <p className="text-slate-500 text-lg">Manage your appointments and patients</p>
+          </div>
+          <Button 
+            onClick={loadAppointments} 
+            disabled={loading}
+            variant="outline"
+            className="flex items-center gap-2 px-6 py-3"
+          >
+            <span className={loading ? "animate-spin" : ""}>🔄</span>
+            {loading ? 'Refreshing...' : 'Refresh List'}
+          </Button>
+        </header>
       
-      {appointments.length === 0 ? (
-        <div className="text-center text-gray-500 py-8">
-          <p className="text-xl">No upcoming appointments</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {appointments.map(app => (
-            <Card key={app.id} className="hover:shadow-lg transition-shadow">
-              <div className="flex flex-col gap-3">
-                <div className="text-lg font-semibold text-blue-600">
-                  Appointment #{app.id}
-                </div>
-                <div className="text-gray-700">
-                  <span className="font-medium">Date & Time:</span> {formatDateTime(app.appointmentTime)}
-                </div>
-                <div className="text-sm">
-                  <span className={`px-2 py-1 rounded ${
-                    app.status === 'SCHEDULED' ? 'bg-green-100 text-green-800' :
-                    app.status === 'COMPLETED' ? 'bg-gray-100 text-gray-800' :
-                    'bg-yellow-100 text-yellow-800'
-                  }`}>
-                    {app.status}
-                  </span>
-                </div>
-                <div className="text-gray-700">
-                  <span className="font-medium">Pet ID:</span> {app.petId}
-                </div>
-                <div className="pt-3 border-t border-gray-200">
-                  <Link 
-                    to={`/doctor/pet/${app.petId}`} 
-                    className="text-blue-600 hover:text-blue-800 underline font-medium"
-                  >
-                    View Medical History
-                  </Link>
-                </div>
-              </div>
+        {appointments.length === 0 ? (
+            <Card className="p-16 text-center border-dashed border-2 border-slate-200 bg-slate-50/50">
+                <div className="text-6xl mb-6">📅</div>
+                <h3 className="text-2xl font-medium text-slate-700 mb-2">No appointments found</h3>
+                <p className="text-slate-500 text-lg">You don't have any upcoming appointments scheduled.</p>
             </Card>
-          ))}
-        </div>
-      )}
+        ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {appointments.map(app => (
+                <Card key={app.id} className="hover:shadow-lg transition-all duration-300 border-t-4 border-t-primary-500 group p-8">
+                <div className="flex flex-col gap-6">
+                    <div className="flex justify-between items-start">
+                        <div className="text-xl font-bold text-slate-800">
+                            Appointment #{app.id}
+                        </div>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide ${
+                            app.status === 'SCHEDULED' ? 'bg-green-100 text-green-700' :
+                            app.status === 'COMPLETED' ? 'bg-slate-100 text-slate-700' :
+                            'bg-yellow-100 text-yellow-700'
+                        }`}>
+                            {app.status}
+                        </span>
+                    </div>
+                    
+                    <div className="space-y-3 text-slate-600">
+                        <div className="flex items-center gap-3">
+                            <span className="text-lg">🕒</span>
+                            <span className="font-medium">{formatDateTime(app.appointmentTime)}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <span className="text-lg">🐾</span>
+                            <span>Pet: {app.petName || `ID ${app.petId}`}</span>
+                        </div>
+                    </div>
+
+                    <div className="pt-6 mt-2 border-t border-slate-100">
+                        <Link 
+                            to={`/doctor/pet/${app.petId}`}
+                            state={{ appointmentId: app.id, appointmentDate: app.appointmentTime }}
+                        >
+                            <Button variant="secondary" className="w-full justify-center group-hover:bg-secondary-600 py-3">
+                                View Medical History
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+                </Card>
+            ))}
+            </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -9,5 +9,7 @@ public record AppointmentDTO(
     @NotNull LocalDateTime appointmentTime,
     @NotNull Long petId,
     @NotNull Long doctorId,
-    String status
+    String status,
+    String petName,
+    String doctorName
 ) {}

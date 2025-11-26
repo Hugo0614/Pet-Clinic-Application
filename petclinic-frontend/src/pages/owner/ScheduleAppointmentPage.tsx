@@ -14,9 +14,11 @@ interface Pet {
 }
 
 interface Doctor {
-  id: number;
+  doctorId: number;
+  userId: number;
   username: string;
-  role: string;
+  specialization: string;
+  active: boolean;
 }
 
 // Generate business hours time slots (09:00 - 19:00, 30-minute intervals)
@@ -57,7 +59,7 @@ const ScheduleAppointmentPage: React.FC = () => {
         setPetId(petsRes.data[0].id.toString());
       }
       if (doctorsRes.data.length > 0) {
-        setDoctorId(doctorsRes.data[0].id.toString());
+        setDoctorId(doctorsRes.data[0].doctorId.toString());
       }
       
       setLoading(false);
@@ -90,129 +92,117 @@ const ScheduleAppointmentPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card className="max-w-md w-full">
-          <div className="text-center">Loading...</div>
-        </Card>
-      </div>
-    );
-  }
-
-  if (pets.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card className="max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4 text-center text-red-600">No Pets Found</h2>
-          <p className="text-center mb-4">You need to add a pet before scheduling an appointment.</p>
-          <Button onClick={() => navigate('/owner')}>Go to Dashboard</Button>
-        </Card>
-      </div>
-    );
-  }
-
-  if (doctors.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-100">
-        <Card className="max-w-md w-full">
-          <h2 className="text-2xl font-bold mb-4 text-center text-red-600">No Doctors Available</h2>
-          <p className="text-center mb-4">No doctors are currently registered in the system.</p>
-          <Button onClick={() => navigate('/owner')}>Go to Dashboard</Button>
-        </Card>
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="animate-spin text-4xl">🐾</div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4 text-center">Schedule Appointment</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Pet Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Pet
-            </label>
-            <select
-              className="border border-gray-300 px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={petId}
-              onChange={e => setPetId(e.target.value)}
-              required
-            >
-              {pets.map(pet => (
-                <option key={pet.id} value={pet.id}>
-                  {pet.name} ({pet.species})
-                </option>
-              ))}
-            </select>
-          </div>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-12 flex items-center justify-center">
+      <Card className="max-w-2xl w-full relative overflow-hidden p-8 md:p-10">
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary-400 to-secondary-400"></div>
+        
+        <div className="mb-10 text-center">
+            <div className="text-5xl mb-4">📅</div>
+            <h2 className="text-3xl font-bold text-slate-800 mb-2">Schedule Appointment</h2>
+            <p className="text-slate-500 text-lg">Book a visit for your pet</p>
+        </div>
 
-          {/* Doctor Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Doctor
-            </label>
-            <select
-              className="border border-gray-300 px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={doctorId}
-              onChange={e => setDoctorId(e.target.value)}
-              required
-            >
-              {doctors.map(doctor => (
-                <option key={doctor.id} value={doctor.id}>
-                  Dr. {doctor.username}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Date Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Date
-            </label>
-            <Input
-              type="date"
-              value={appointmentDate}
-              onChange={e => setAppointmentDate(e.target.value)}
-              min={new Date().toISOString().split('T')[0]}
-              required
-            />
-          </div>
-
-          {/* Time Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Select Time (Business Hours: 9:00 AM - 7:00 PM)
-            </label>
-            <select
-              className="border border-gray-300 px-3 py-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={appointmentTime}
-              onChange={e => setAppointmentTime(e.target.value)}
-              required
-            >
-              {timeSlots.map(slot => (
-                <option key={slot} value={slot}>
-                  {slot}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {error && (
-            <div className="text-red-500 text-sm font-semibold bg-red-50 p-3 rounded border border-red-200">
-              {error}
+        {pets.length === 0 ? (
+            <div className="text-center py-10">
+                <p className="text-slate-600 mb-6 text-lg">You need to add a pet before scheduling an appointment.</p>
+                <Button onClick={() => navigate('/owner')} variant="primary" className="px-8 py-3">
+                    Go to Dashboard
+                </Button>
             </div>
-          )}
-          
-          <div className="flex gap-2">
-            <Button type="button" onClick={() => navigate('/owner')} className="flex-1 bg-gray-500 hover:bg-gray-600">
-              Cancel
-            </Button>
-            <Button type="submit" className="flex-1">
-              Schedule Appointment
-            </Button>
-          </div>
-        </form>
+        ) : doctors.length === 0 ? (
+            <div className="text-center py-10">
+                <p className="text-slate-600 mb-6 text-lg">No doctors are currently available.</p>
+                <Button onClick={() => navigate('/owner')} variant="primary" className="px-8 py-3">
+                    Go to Dashboard
+                </Button>
+            </div>
+        ) : (
+            <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Select Pet</label>
+                        <select
+                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-white"
+                            value={petId}
+                            onChange={e => setPetId(e.target.value)}
+                            required
+                        >
+                            {pets.map(pet => (
+                                <option key={pet.id} value={pet.id}>
+                                    {pet.name} ({pet.species})
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Select Doctor</label>
+                        <select
+                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-white"
+                            value={doctorId}
+                            onChange={e => setDoctorId(e.target.value)}
+                            required
+                        >
+                            {doctors.map(doc => (
+                                <option key={doc.doctorId} value={doc.doctorId}>
+                                    Dr. {doc.username}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Date</label>
+                        <Input
+                            type="date"
+                            value={appointmentDate}
+                            onChange={e => setAppointmentDate(e.target.value)}
+                            required
+                            className="w-full p-3"
+                            min={new Date().toISOString().split('T')[0]}
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Time</label>
+                        <select
+                            className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all bg-white"
+                            value={appointmentTime}
+                            onChange={e => setAppointmentTime(e.target.value)}
+                            required
+                        >
+                            {timeSlots.map(slot => (
+                                <option key={slot} value={slot}>
+                                    {slot}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {error && (
+                    <div className="p-4 bg-red-50 text-red-500 text-sm rounded-lg flex items-center gap-3">
+                        <span className="text-lg">⚠️</span> {error}
+                    </div>
+                )}
+
+                <div className="flex gap-4 pt-6">
+                    <Button type="button" variant="outline" onClick={() => navigate('/owner')} className="flex-1 py-3">
+                        Cancel
+                    </Button>
+                    <Button type="submit" variant="primary" className="flex-1 py-3">
+                        Confirm Booking
+                    </Button>
+                </div>
+            </form>
+        )}
       </Card>
     </div>
   );

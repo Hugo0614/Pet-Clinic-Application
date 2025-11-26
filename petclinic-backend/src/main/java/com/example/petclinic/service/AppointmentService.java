@@ -36,7 +36,7 @@ public class AppointmentService {
         String doctorStr = String.format("D%03d", doctorId);
         
         // Get count of appointments for this doctor on this date
-        long count = appointmentRepository.findByDoctorId(doctorId).stream()
+        long count = appointmentRepository.findByDoctorDoctorId(doctorId).stream()
                 .filter(a -> a.getAppointmentTime().toLocalDate().equals(date))
                 .count();
         
@@ -58,7 +58,7 @@ public class AppointmentService {
         }
         
         // Check for scheduling conflicts (doctor-specific)
-        List<Appointment> conflicts = appointmentRepository.findByDoctorId(doctorId).stream()
+        List<Appointment> conflicts = appointmentRepository.findByDoctorDoctorId(doctorId).stream()
                 .filter(a -> a.getAppointmentTime().equals(appointmentTime))
                 .toList();
         
@@ -84,7 +84,7 @@ public class AppointmentService {
     }
 
     public List<Appointment> getAppointmentsForDoctor(Long doctorId, LocalDateTime start, LocalDateTime end) {
-        return appointmentRepository.findByDoctorId(doctorId).stream()
+        return appointmentRepository.findByDoctorDoctorId(doctorId).stream()
                 .filter(a -> !a.getAppointmentTime().isBefore(start) && !a.getAppointmentTime().isAfter(end))
                 .toList();
     }
@@ -107,7 +107,7 @@ public class AppointmentService {
         }
         
         // Check for scheduling conflicts (doctor-specific), excluding current appointment
-        List<Appointment> conflicts = appointmentRepository.findByDoctorId(doctorId).stream()
+        List<Appointment> conflicts = appointmentRepository.findByDoctorDoctorId(doctorId).stream()
                 .filter(a -> !a.getId().equals(appointmentId)) // Exclude current appointment
                 .filter(a -> a.getAppointmentTime().equals(appointmentTime))
                 .toList();

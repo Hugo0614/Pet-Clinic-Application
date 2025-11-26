@@ -14,9 +14,11 @@ interface Pet {
 }
 
 interface Doctor {
-  id: number;
+  doctorId: number;
+  userId: number;
   username: string;
-  role: string;
+  specialization: string;
+  active: boolean;
 }
 
 interface Appointment {
@@ -170,7 +172,7 @@ const EditAppointmentPage: React.FC = () => {
               required
             >
               {doctors.map(doctor => (
-                <option key={doctor.id} value={doctor.id}>
+                <option key={doctor.doctorId} value={doctor.doctorId}>
                   Dr. {doctor.username}
                 </option>
               ))}

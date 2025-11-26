@@ -84,7 +84,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ value, onChange, error, onValid
         <select
           value={countryCode}
           onChange={(e) => handleCountryChange(e.target.value)}
-          className="border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-slate-300 px-3 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all bg-white"
         >
           {COUNTRY_CONFIGS.map((config) => (
             <option key={config.code} value={config.code}>
@@ -97,7 +97,7 @@ const PhoneInput: React.FC<PhoneInputProps> = ({ value, onChange, error, onValid
           value={phoneNumber}
           onChange={(e) => handlePhoneChange(e.target.value)}
           placeholder={currentConfig?.placeholder || ''}
-          className="flex-1 border border-gray-300 px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 border border-slate-300 px-4 py-2.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all placeholder:text-slate-400"
         />
       </div>
       {(validationError || error) && (

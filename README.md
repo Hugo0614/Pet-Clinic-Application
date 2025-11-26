@@ -23,31 +23,105 @@ This is a full-stack application that allows pet owners and veterinarians to man
 - **Tailwind CSS:** For styling the application.
 - **React Context API:** For managing global state (e.g., authentication).
 
+## Testing Infrastructure
+
+This project now includes comprehensive testing infrastructure for both backend and frontend:
+
+### Backend Testing
+- **Testing Framework:** JUnit 5 + Mockito + Spring Boot Test
+- **Test Database:** H2 in-memory database (isolated from production MySQL)
+- **Test Coverage:** 
+  - Unit tests for services (AppointmentServiceTest)
+  - Integration tests for controllers (AuthControllerTest, PetControllerTest)
+  - API testing with MockMvc and RestAssured
+- **Test Configuration:** `application-test.properties` with H2 database
+- **Running Tests:** `cd petclinic-backend && mvn test`
+
+### Frontend Testing
+- **E2E Testing:** Cypress for end-to-end testing
+- **Test Files:** Located in `petclinic-frontend/cypress/e2e/`
+- **Running Tests:** `cd petclinic-frontend && npm run test:e2e`
+
+### Test Isolation
+Tests use completely separate databases from development/production:
+- **Development:** MySQL (via `start_dev.sh`)
+- **Testing:** H2 in-memory database (via `mvn test`)
+- **Production:** MySQL (via Docker)
+
+## Docker Containerization
+
+This project is fully containerized with Docker for easy deployment:
+
+### Docker Setup
+- **Multi-stage Builds:** Optimized Dockerfile for both backend and frontend
+- **Services:**
+  - MySQL 8.0 database
+  - Spring Boot backend (Java 21)
+  - React frontend (served by Nginx)
+- **Docker Compose:** Orchestrates all services with proper networking and health checks
+- **Quick Start:** `./docker-start.sh` (one command to build and run everything)
+- **Stop Services:** `./docker-stop.sh`
+
+### Docker Commands
+```bash
+# Start all services in Docker
+./docker-start.sh
+
+# Stop all services
+./docker-stop.sh
+
+# View logs
+docker compose logs -f
+
+# Rebuild without cache
+docker compose build --no-cache
+```
+
+### Port Configuration
+- Frontend: http://localhost (port 80)
+- Backend API: http://localhost:8080
+- MySQL: localhost:3306 (internal only)
+
 ## CI/CD Automation
 
-This project integrates a comprehensive GitHub Actions CI/CD pipeline to automate the building and testing process. The pipeline is configured to run automatically whenever code is pushed to the `main` branch.
+This project integrates a comprehensive GitHub Actions CI/CD pipeline to automate testing, building, and Docker image publishing. The pipeline is configured to run automatically whenever code is pushed to the `main` branch.
 
 ### How it works:
 
 - **Trigger:** The workflow is triggered on every `push` event to the `main` branch.
-- **Parallel Jobs:** The pipeline consists of two independent jobs that run in parallel:
-  - **Backend Build Job (`build-backend`):** 
-    - Sets up Java Development Kit (JDK) 21
-    - Caches Maven dependencies to accelerate subsequent builds
-    - Compiles, tests, and packages the backend application using Maven
-  - **Frontend Build Job (`build-frontend`)**:
-    - Sets up Node.js 20.x runtime
-    - Caches NPM dependencies to accelerate subsequent builds
-    - Installs frontend dependencies via npm
-    - Builds the frontend application using Vite
+- **Pipeline Jobs:** The pipeline consists of 5 jobs that ensure quality and automate deployment:
+  1. **Backend Testing (`test-backend`):** 
+     - Sets up Java Development Kit (JDK) 21
+     - Runs all backend tests with H2 database
+     - Generates test reports
+  
+  2. **Backend Build & Push (`build-backend`):**
+     - Builds Docker image for Spring Boot application
+     - Pushes image to GitHub Container Registry (GHCR)
+     - Uses Docker layer caching for faster builds
+  
+  3. **Frontend Testing (`test-frontend`):**
+     - Sets up Node.js 20.x runtime
+     - Runs Cypress E2E tests
+     - Generates test reports
+  
+  4. **Frontend Build & Push (`build-frontend`):**
+     - Builds Docker image for React application
+     - Pushes image to GitHub Container Registry (GHCR)
+     - Optimized Nginx configuration
+  
+  5. **Deployment Summary (`deploy-summary`):**
+     - Aggregates all job results
+     - Provides deployment status and image tags
 
 ### Performance Optimization:
 
 The workflow uses GitHub Actions' caching mechanism (`actions/cache`) to cache:
 - Maven dependencies (`~/.m2/repository`) for faster backend builds
 - NPM dependencies (`node_modules`) for faster frontend builds
+- Docker layers for faster image builds
 
-This significantly reduces build times for subsequent runs by avoiding redundant dependency downloads.
+This significantly reduces build times for subsequent runs by avoiding redundant dependency downloads and layer rebuilds.
 
 ### GitHub Actions Status Badge:
 

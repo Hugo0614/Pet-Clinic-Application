@@ -2,7 +2,9 @@ package com.example.petclinic.controller;
 
 import com.example.petclinic.dto.AppointmentDTO;
 import com.example.petclinic.model.Appointment;
+import com.example.petclinic.model.Doctor;
 import com.example.petclinic.model.User;
+import com.example.petclinic.repository.DoctorRepository;
 import com.example.petclinic.repository.UserRepository;
 import com.example.petclinic.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ public class AppointmentController {
     private AppointmentService appointmentService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private DoctorRepository doctorRepository;
 
     @PostMapping
     public AppointmentDTO createAppointment(@Validated @RequestBody AppointmentDTO appointmentDTO, @AuthenticationPrincipal UserDetails userDetails) {
@@ -35,7 +39,9 @@ public class AppointmentController {
                 appointment.getAppointmentTime(),
                 appointment.getPet().getId(),
                 appointment.getDoctor().getDoctorId(),
-                appointment.getStatus()
+                appointment.getStatus(),
+                appointment.getPet().getName(),
+                appointment.getDoctor().getUser().getUsername()
         );
     }
 
@@ -50,21 +56,29 @@ public class AppointmentController {
                             a.getAppointmentTime(),
                             a.getPet().getId(),
                             a.getDoctor().getDoctorId(),
-                            a.getStatus()
+                            a.getStatus(),
+                            a.getPet().getName(),
+                            a.getDoctor().getUser().getUsername()
                     ))
                     .collect(Collectors.toList());
         } else if ("DOCTOR".equals(user.getRole())) {
+            // Get the doctor record for this user
+            Doctor doctor = doctorRepository.findByUserId(user.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("Doctor record not found for user"));
+            
             // Show all upcoming appointments (from now onwards) instead of just today
             LocalDateTime now = LocalDateTime.now();
             LocalDateTime farFuture = LocalDateTime.now().plusYears(1); // Next year
-            return appointmentService.getAppointmentsForDoctor(user.getId(), now, farFuture).stream()
+            return appointmentService.getAppointmentsForDoctor(doctor.getDoctorId(), now, farFuture).stream()
                     .map(a -> new AppointmentDTO(
                             a.getId(),
                             a.getAppointmentCode(),
                             a.getAppointmentTime(),
                             a.getPet().getId(),
                             a.getDoctor().getDoctorId(),
-                            a.getStatus()
+                            a.getStatus(),
+                            a.getPet().getName(),
+                            a.getDoctor().getUser().getUsername()
                     ))
                     .collect(Collectors.toList());
         }
@@ -88,7 +102,9 @@ public class AppointmentController {
                 appointment.getAppointmentTime(),
                 appointment.getPet().getId(),
                 appointment.getDoctor().getDoctorId(),
-                appointment.getStatus()
+                appointment.getStatus(),
+                appointment.getPet().getName(),
+                appointment.getDoctor().getUser().getUsername()
         );
     }
 

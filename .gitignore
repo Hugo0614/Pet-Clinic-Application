@@ -49,6 +49,34 @@ cypress/videos/
 process-documentation/
 test-utilities/
 
+# Reference documentation (for development reference only, not for production)
+*_ARCHITECTURE_DIAGRAM.md
+*_TESTING_GUIDE.md
+*_VISUAL_GUIDE.md
+*_SUMMARY*.md
+*_FIX*.md
+*_ANALYSIS.md
+*_PLAN*.md
+*_STATUS.md
+*_REFACTOR*.md
+*_GUIDE*.md
+*_QUICKSTART.md
+*_REFERENCE.md
+*_PROTECTION_GUIDE.md
+*_SPEC*.md
+*_NAVIGATION*.md
+*_COMPLETION*.md
+*_DEMO*.md
+TEST_ERRORS_FIXED.md
+TROUBLESHOOTING*.md
+WHY_*.md
+VALIDATION_*.md
+YAML_SPEC*.md
+diagnose_*.sh
+migrate_*.sql
+backup_*.sql
+*.log
+
 # Database backups (local only)
 backup_*.sql
 *.sql.backup
