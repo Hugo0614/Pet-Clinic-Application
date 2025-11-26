@@ -14,7 +14,7 @@ This is a full-stack application that allows pet owners and veterinarians to man
 - **JSON Web Tokens (JWT):** Used for securing the RESTful API.
 - **Maven:** For dependency management and building the project.
 
-### Frontend
+### Frontend (Web)
 - **React:** JavaScript library for building the user interface.
 - **TypeScript:** For adding static types to JavaScript.
 - **Vite:** Modern frontend build tool.
@@ -22,6 +22,15 @@ This is a full-stack application that allows pet owners and veterinarians to man
 - **React Router:** For handling routing and navigation.
 - **Tailwind CSS:** For styling the application.
 - **React Context API:** For managing global state (e.g., authentication).
+
+### Mobile (React Native)
+- **React Native:** Framework for building native mobile applications.
+- **Expo:** Development platform and toolchain (SDK 54).
+- **React Navigation:** Navigation library for mobile screens.
+- **TypeScript:** For type-safe mobile development.
+- **Axios:** API communication with backend.
+- **AsyncStorage:** Persistent storage for tokens and user data.
+- **Platform-aware API Configuration:** Automatic backend URL detection for iOS/Android simulators and physical devices.
 
 ## Testing Infrastructure
 
@@ -42,11 +51,17 @@ This project now includes comprehensive testing infrastructure for both backend 
 - **Test Files:** Located in `petclinic-frontend/cypress/e2e/`
 - **Running Tests:** `cd petclinic-frontend && npm run test:e2e`
 
+### Mobile App Testing
+- **Development Mode:** Expo Hot Reload (automatic code refresh)
+- **Platform Testing:** iOS Simulator, Android Emulator, or Physical Devices via Expo Go
+- **API Testing:** Platform-aware backend connectivity testing
+
 ### Test Isolation
 Tests use completely separate databases from development/production:
 - **Development:** MySQL (via `start_dev.sh`)
 - **Testing:** H2 in-memory database (via `mvn test`)
 - **Production:** MySQL (via Docker)
+- **Mobile Development:** Connects to development or production backend
 
 ## Docker Containerization
 
@@ -133,35 +148,90 @@ You can add a status badge to display the CI/CD pipeline status:
 
 ## Features
 
-### Backend (Backend API)
+### Backend API
 
 **What it does:**
-- **User Authentication:** Handles user registration and login.
-- **Role-Based Access Control (RBAC):** Differentiates between "OWNER" and "DOCTOR" roles, restricting access to certain functionalities.
-- **Pet Management:** Allows owners to perform CRUD (Create, Read, Update, Delete) operations for their pets.
-- **Appointment Management:** Enables owners to schedule appointments and doctors to view their appointments.
-- **Medical Record Management:** Allows doctors to create and view medical records for pets.
+- **User Authentication:** Handles user registration and login with JWT tokens.
+- **Role-Based Access Control (RBAC):** Differentiates between "OWNER" and "DOCTOR" roles.
+- **Pet Management:** Allows owners to perform CRUD operations for their pets.
+- **Appointment Management:** Enables owners to schedule appointments and doctors to view appointments.
+- **Medical Record Management:** Allows doctors to create and view medical records.
+- **Cross-Platform API:** Serves both web and mobile frontends with the same REST API.
 
 **How it's implemented:**
-- **RESTful API:** Uses `@RestController` and `@RequestMapping` to define API endpoints for frontend communication.
-- **Service Layer:** Employs `@Service` classes to encapsulate business logic, separating it from the controller layer.
-- **Data Persistence:** Leverages `@Repository` interfaces extending `JpaRepository` for seamless interaction with the MySQL database.
-- **DTO Pattern:** Utilizes Data Transfer Objects (DTOs) to transfer data between the client and server, preventing the exposure of internal JPA entities.
+- **RESTful API:** Uses `@RestController` and `@RequestMapping` for API endpoints.
+- **Service Layer:** Employs `@Service` classes for business logic separation.
+- **Data Persistence:** Leverages `@Repository` with `JpaRepository` for database operations.
+- **DTO Pattern:** Uses Data Transfer Objects to prevent internal entity exposure.
 
-### Frontend (Frontend UI)
+### Web Frontend
 
 **What it does:**
-- **User Registration and Login:** Provides forms for users to register and log in.
-- **Responsive Navigation and Layout:** A clean and responsive UI that works on different screen sizes.
-- **Owner Dashboard:** Allows owners to view their pets and manage appointments.
-- **Doctor Dashboard:** Allows doctors to view their scheduled appointments and manage medical records.
-- **Protected Routes:** Prevents unauthenticated users from accessing protected pages like dashboards.
+- **User Registration and Login:** Forms for account creation and authentication.
+- **Responsive Design:** Mobile-first responsive UI with Tailwind CSS.
+- **Owner Dashboard:** View pets, manage appointments, and schedule visits.
+- **Doctor Dashboard:** View scheduled appointments and manage medical records.
+- **Protected Routes:** Authentication-based route protection.
 
 **How it's implemented:**
-- **Component-Based Architecture:** Built with React functional components and Hooks (e.g., `useState`, `useEffect`).
-- **Routing:** Uses `react-router-dom` for client-side routing and to implement `ProtectedRoute` for securing routes.
-- **State Management:** Manages global authentication state (user and token) using the Context API (`AuthContext`).
-- **API Communication:** Configures Axios with a service instance (`api.ts`) to communicate with the Spring Boot backend, including an interceptor to attach JWTs to requests.
+- **Component-Based:** React functional components with Hooks (`useState`, `useEffect`).
+- **Routing:** `react-router-dom` for client-side routing with `ProtectedRoute`.
+- **State Management:** Global auth state via Context API (`AuthContext`).
+- **API Communication:** Axios with JWT interceptor for backend communication.
+
+### Mobile App (React Native)
+
+**What it does:**
+- **Native Mobile Experience:** iOS and Android compatible mobile application.
+- **Account Management:** Register and login as pet owner or doctor.
+- **Owner Features:**
+  - View all owned pets with details
+  - Schedule appointments with available doctors
+  - View and manage upcoming appointments
+  - Cancel appointments
+- **Doctor Features:**
+  - View assigned appointments
+  - Access patient (pet) information
+- **Cross-Platform:** Single codebase for both iOS and Android.
+
+**How it's implemented:**
+- **React Native + Expo:** Expo SDK 54 with managed workflow.
+- **Navigation:**
+  - Stack navigation for authentication flow
+  - Tab navigation for owner dashboard
+- **UI Components:**
+  - Custom component library (Button, Input, Card)
+  - Consistent theming with web frontend
+  - Platform-specific adaptations (iOS Picker styling)
+- **API Integration:**
+  - Automatic platform detection for backend URL
+  - iOS: `localhost:8080`
+  - Android Emulator: `10.0.2.2:8080`
+  - Physical Device: Custom IP configuration
+- **Authentication:**
+  - JWT token storage with AsyncStorage
+  - Automatic token injection in API requests
+  - Persistent login sessions
+
+**Starting the Mobile App:**
+```bash
+# Option 1: Full stack with backend (recommended)
+./start-mobile.sh
+# Select option 1 (new terminal) or 2 (tmux)
+
+# Option 2: Mobile only (backend must be running separately)
+cd petclinic-mobile
+npm start
+
+# Option 3: Tunnel mode (for VPN or different networks)
+npm run start:tunnel
+```
+
+**Mobile Development Features:**
+- **Hot Reload:** Code changes automatically refresh the app.
+- **Multi-Terminal Support:** Backend and frontend run in separate terminals for clean log separation.
+- **Expo Go Testing:** Scan QR code to test on physical devices.
+- **Development Tools:** React DevTools, network debugging, and console logging.
 
 ## Architecture Deep Dive
 
